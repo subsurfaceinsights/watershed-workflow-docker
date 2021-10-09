@@ -1,0 +1,27 @@
+#/bin/bash
+HOST_DIR="`pwd ./`"
+HOST_USERNAME=$USER
+
+if [ -t 0 ] ; then
+  TTY_FLAGS='-ti'
+else
+  TTY_FLAGS='-i'
+fi
+
+WATERSHED_DATA_DIR="`realpath ~/watershed-workflow-container-data`"
+
+if [ ! -d "$WATERSHED_DATA_DIR" ]
+then
+  echo "Creating '$WATERSHED_DATA_DIR' for watershed workflow data"
+  mkdir -p "$WATERSHED_DATA_DIR"
+fi
+
+docker run --rm $TTY_FLAGS \
+  -p 8888:8888 \
+  -e "HOST_DIR=$HOST_DIR" \
+  -e "HOST_USERNAME=$HOST_USERNAME" \
+  -e "DISPLAY:$DISPLAY" \
+  -v "/tmp/.X11-unix:/tmp/.X11-unix" \
+  -v "$HOST_DIR:$HOST_DIR" \
+  -v "$WATERSHED_DATA_DIR:/watershed-workflow/data" \
+  subsurfaceinsights/watershed-workflow $@
